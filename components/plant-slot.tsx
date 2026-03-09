@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Flor } from "@/lib/flores"
 import { cn } from "@/lib/utils"
 import { Plus, X } from "lucide-react"
+import { FlowerIcon } from "./flower-icon"
 
 interface PlantSlotProps {
   label: string
@@ -60,12 +61,16 @@ export function PlantSlot({ label, flor, onClear, onDrop, isActive }: PlantSlotP
       >
         {flor ? (
           <div className="flex flex-col items-center">
-            <span 
-              className="text-4xl drop-shadow-lg"
-              style={{ filter: `drop-shadow(0 0 8px ${flor.colorHex})` }}
-            >
-              {flor.icono}
-            </span>
+            <FlowerIcon
+              color={flor.colorHex}
+              secondaryColor={flor.colorSecundario}
+              centerColor={flor.colorCentro}
+              petalShape={flor.petalos}
+              centerShape={flor.centro}
+              petalCount={flor.numeroPetalos}
+              size={56}
+              animate
+            />
             <span className="mt-1 font-mono text-sm font-bold text-primary">
               {flor.genotipo}
             </span>

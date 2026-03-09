@@ -1,11 +1,18 @@
+export type PetalShape = "rounded" | "pointed" | "heart" | "wavy" | "tulip"
+export type CenterShape = "circle" | "star" | "dots" | "spiral"
+
 export interface Flor {
   id: string
   nombre: string
   color: string
   colorHex: string
+  colorSecundario?: string
+  colorCentro?: string
   genotipo: string
   esDominante: boolean
-  icono: string
+  petalos?: PetalShape
+  centro?: CenterShape
+  numeroPetalos?: number
 }
 
 export const flores: Flor[] = [
@@ -14,72 +21,104 @@ export const flores: Flor[] = [
     nombre: "Orquídea Púrpura",
     color: "Púrpura",
     colorHex: "#9333ea",
+    colorSecundario: "#a855f7",
+    colorCentro: "#fbbf24",
     genotipo: "PP",
     esDominante: true,
-    icono: "🌸",
+    petalos: "wavy",
+    centro: "dots",
+    numeroPetalos: 5,
   },
   {
     id: "orquidea-amarilla",
     nombre: "Orquídea Amarilla",
     color: "Amarillo",
     colorHex: "#eab308",
+    colorSecundario: "#fde047",
+    colorCentro: "#f97316",
     genotipo: "pp",
     esDominante: false,
-    icono: "🌼",
+    petalos: "wavy",
+    centro: "dots",
+    numeroPetalos: 5,
   },
   {
     id: "rosa-roja",
     nombre: "Rosa Roja",
     color: "Rojo",
     colorHex: "#dc2626",
+    colorSecundario: "#ef4444",
+    colorCentro: "#fbbf24",
     genotipo: "RR",
     esDominante: true,
-    icono: "🌹",
+    petalos: "heart",
+    centro: "spiral",
+    numeroPetalos: 8,
   },
   {
     id: "rosa-blanca",
     nombre: "Rosa Blanca",
     color: "Blanco",
-    colorHex: "#f5f5f4",
+    colorHex: "#fafaf9",
+    colorSecundario: "#e7e5e4",
+    colorCentro: "#fcd34d",
     genotipo: "rr",
     esDominante: false,
-    icono: "🤍",
+    petalos: "heart",
+    centro: "spiral",
+    numeroPetalos: 8,
   },
   {
     id: "rosa-rosa",
     nombre: "Rosa Rosa",
     color: "Rosa",
     colorHex: "#f472b6",
+    colorSecundario: "#f9a8d4",
+    colorCentro: "#fbbf24",
     genotipo: "Rr",
     esDominante: true,
-    icono: "🌷",
+    petalos: "heart",
+    centro: "spiral",
+    numeroPetalos: 8,
   },
   {
     id: "tulipan-naranja",
     nombre: "Tulipán Naranja",
     color: "Naranja",
     colorHex: "#f97316",
+    colorSecundario: "#fb923c",
+    colorCentro: "#fbbf24",
     genotipo: "TT",
     esDominante: true,
-    icono: "🌷",
+    petalos: "tulip",
+    centro: "circle",
+    numeroPetalos: 6,
   },
   {
     id: "tulipan-verde",
     nombre: "Tulipán Verde",
     color: "Verde",
     colorHex: "#22c55e",
+    colorSecundario: "#4ade80",
+    colorCentro: "#fbbf24",
     genotipo: "tt",
     esDominante: false,
-    icono: "🌿",
+    petalos: "tulip",
+    centro: "circle",
+    numeroPetalos: 6,
   },
   {
     id: "tulipan-mixto",
     nombre: "Tulipán Mixto",
     color: "Naranja-Verde",
     colorHex: "#84cc16",
+    colorSecundario: "#f97316",
+    colorCentro: "#fbbf24",
     genotipo: "Tt",
     esDominante: true,
-    icono: "🌱",
+    petalos: "tulip",
+    centro: "circle",
+    numeroPetalos: 6,
   },
 ]
 

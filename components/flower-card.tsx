@@ -3,6 +3,7 @@
 import { Flor } from "@/lib/flores"
 import { cn } from "@/lib/utils"
 import { GripVertical } from "lucide-react"
+import { FlowerIcon } from "./flower-icon"
 
 interface FlowerCardProps {
   flor: Flor
@@ -40,20 +41,24 @@ export function FlowerCard({ flor, isSelected, onClick, size = "md", isDragging 
       )}>
         <GripVertical className="w-3 h-3" />
       </div>
-      {/* Color indicator */}
+      {/* Custom flower icon */}
       <div
         className={cn(
-          "rounded-full mb-2 flex items-center justify-center shadow-inner",
-          size === "md" ? "w-12 h-12 text-2xl" : "w-8 h-8 text-lg"
+          "rounded-full mb-2 flex items-center justify-center",
+          size === "md" ? "w-14 h-14" : "w-10 h-10"
         )}
-        style={{ backgroundColor: flor.colorHex + "30" }}
+        style={{ backgroundColor: flor.colorHex + "15" }}
       >
-        <span
-          className="drop-shadow-sm"
-          style={{ filter: `drop-shadow(0 0 4px ${flor.colorHex})` }}
-        >
-          {flor.icono}
-        </span>
+        <FlowerIcon
+          color={flor.colorHex}
+          secondaryColor={flor.colorSecundario}
+          centerColor={flor.colorCentro}
+          petalShape={flor.petalos}
+          centerShape={flor.centro}
+          petalCount={flor.numeroPetalos}
+          size={size === "md" ? 44 : 32}
+          animate={false}
+        />
       </div>
       
       {/* Flower name */}
