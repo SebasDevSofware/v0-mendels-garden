@@ -2,27 +2,44 @@
 
 import { Flor } from "@/lib/flores"
 import { cn } from "@/lib/utils"
+import { GripVertical } from "lucide-react"
 
 interface FlowerCardProps {
   flor: Flor
   isSelected?: boolean
   onClick?: () => void
   size?: "sm" | "md"
+  isDragging?: boolean
 }
 
-export function FlowerCard({ flor, isSelected, onClick, size = "md" }: FlowerCardProps) {
+export function FlowerCard({ flor, isSelected, onClick, size = "md", isDragging }: FlowerCardProps) {
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData("application/json", JSON.stringify(flor))
+    e.dataTransfer.effectAllowed = "copy"
+  }
+
   return (
-    <button
+    <div
+      draggable
+      onDragStart={handleDragStart}
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center rounded-xl border-2 bg-card p-3 transition-all duration-200",
+        "group relative flex flex-col items-center rounded-xl border-2 bg-card p-3 transition-all duration-200 cursor-grab active:cursor-grabbing",
         "hover:scale-105 hover:shadow-lg hover:border-primary/50",
         "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
         isSelected && "border-primary shadow-lg scale-105",
         !isSelected && "border-border",
-        size === "sm" && "p-2"
+        size === "sm" && "p-2",
+        isDragging && "opacity-50 scale-95"
       )}
     >
+      {/* Drag indicator */}
+      <div className={cn(
+        "absolute top-1 left-1 text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors",
+        size === "sm" && "hidden"
+      )}>
+        <GripVertical className="w-3 h-3" />
+      </div>
       {/* Color indicator */}
       <div
         className={cn(
@@ -82,6 +99,6 @@ export function FlowerCard({ flor, isSelected, onClick, size = "md" }: FlowerCar
           </svg>
         </div>
       )}
-    </button>
+    </div>
   )
 }

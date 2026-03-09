@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Flor } from "@/lib/flores"
 import { cn } from "@/lib/utils"
 import { Plus, X } from "lucide-react"
@@ -8,22 +9,53 @@ interface PlantSlotProps {
   label: string
   flor: Flor | null
   onClear?: () => void
+  onDrop?: (flor: Flor) => void
   isActive?: boolean
 }
 
-export function PlantSlot({ label, flor, onClear, isActive }: PlantSlotProps) {
+export function PlantSlot({ label, flor, onClear, onDrop, isActive }: PlantSlotProps) {
+  const [isDragOver, setIsDragOver] = useState(false)
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "copy"
+    setIsDragOver(true)
+  }
+
+  const handleDragLeave = () => {
+    setIsDragOver(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+    
+    try {
+      const data = e.dataTransfer.getData("application/json")
+      const droppedFlor: Flor = JSON.parse(data)
+      onDrop?.(droppedFlor)
+    } catch {
+      // Invalid drop data
+    }
+  }
+
   return (
     <div className="flex flex-col items-center gap-2">
       <span className="text-sm font-medium text-muted-foreground">{label}</span>
       <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
         className={cn(
           "relative w-28 h-28 rounded-full border-4 border-dashed flex items-center justify-center transition-all duration-300",
           flor 
             ? "border-primary bg-primary/10" 
-            : isActive
-              ? "border-primary/50 bg-primary/5"
-              : "border-border bg-muted/50",
-          !flor && "hover:border-primary/30"
+            : isDragOver
+              ? "border-primary bg-primary/20 scale-110"
+              : isActive
+                ? "border-primary/50 bg-primary/5"
+                : "border-border bg-muted/50",
+          !flor && !isDragOver && "hover:border-primary/30"
         )}
       >
         {flor ? (

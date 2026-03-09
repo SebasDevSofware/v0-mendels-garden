@@ -47,7 +47,7 @@ export default function JardinGenetico() {
     return obtenerColorDominante(plantaMadre.genotipo, plantaPadre.genotipo)
   }, [plantaMadre, plantaPadre])
 
-  // Handle flower selection
+  // Handle flower selection (click)
   const handleFlowerSelect = useCallback((flor: Flor) => {
     if (activeSlot === "madre") {
       setPlantaMadre(flor)
@@ -58,6 +58,29 @@ export default function JardinGenetico() {
     setProbabilidadUsuario("")
     setShowCelebration(false)
   }, [activeSlot])
+
+  // Handle drop on mother slot
+  const handleDropMadre = useCallback((flor: Flor) => {
+    setPlantaMadre(flor)
+    if (!plantaPadre) {
+      setActiveSlot("padre")
+    }
+    setProbabilidadUsuario("")
+    setShowCelebration(false)
+  }, [plantaPadre])
+
+  // Handle drop on father slot
+  const handleDropPadre = useCallback((flor: Flor) => {
+    // Check compatibility if mother is already selected
+    if (plantaMadre) {
+      const genMadre = plantaMadre.genotipo[0].toLowerCase()
+      const genPadre = flor.genotipo[0].toLowerCase()
+      if (genMadre !== genPadre) return // Incompatible
+    }
+    setPlantaPadre(flor)
+    setProbabilidadUsuario("")
+    setShowCelebration(false)
+  }, [plantaMadre])
 
   // Handle harvest (validation)
   const handleCosechar = useCallback(() => {
@@ -164,6 +187,7 @@ export default function JardinGenetico() {
                     setActiveSlot("madre")
                     setProbabilidadUsuario("")
                   }}
+                  onDrop={handleDropMadre}
                   isActive={activeSlot === "madre" && !plantaMadre}
                 />
                 
@@ -179,6 +203,7 @@ export default function JardinGenetico() {
                     setActiveSlot("padre")
                     setProbabilidadUsuario("")
                   }}
+                  onDrop={handleDropPadre}
                   isActive={activeSlot === "padre" && !plantaPadre}
                 />
               </div>
