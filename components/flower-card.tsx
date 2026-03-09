@@ -1,44 +1,93 @@
 "use client"
 
-import { Flor } from "@/lib/flores"
+import { Flor, getDescripcionCaracteristica } from "@/lib/flores"
 import { cn } from "@/lib/utils"
+import { GripVertical, Sparkles, AlertTriangle, Flower2, Wind } from "lucide-react"
+import { FlowerIcon } from "./flower-icon"
+
+// Iconos para caracteristicas especiales
+const caracteristicaIconos: Record<string, React.ReactNode> = {
+  espinas: <AlertTriangle className="w-3 h-3" />,
+  venenosa: <AlertTriangle className="w-3 h-3 text-purple-500" />,
+  manchas: <Flower2 className="w-3 h-3" />,
+  bioluminiscente: <Sparkles className="w-3 h-3 text-cyan-400" />,
+  fragante: <Wind className="w-3 h-3 text-pink-400" />,
+  doble: <Flower2 className="w-3 h-3" />,
+}
 
 interface FlowerCardProps {
   flor: Flor
   isSelected?: boolean
   onClick?: () => void
   size?: "sm" | "md"
+  isDragging?: boolean
 }
 
-export function FlowerCard({ flor, isSelected, onClick, size = "md" }: FlowerCardProps) {
+export function FlowerCard({ flor, isSelected, onClick, size = "md", isDragging }: FlowerCardProps) {
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData("application/json", JSON.stringify(flor))
+    e.dataTransfer.effectAllowed = "copy"
+  }
+
   return (
-    <button
+    <div
+      draggable
+      onDragStart={handleDragStart}
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center rounded-xl border-2 bg-card p-3 transition-all duration-200",
+        "group relative flex flex-col items-center rounded-xl border-2 bg-card p-3 transition-all duration-200 cursor-grab active:cursor-grabbing",
         "hover:scale-105 hover:shadow-lg hover:border-primary/50",
         "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
         isSelected && "border-primary shadow-lg scale-105",
         !isSelected && "border-border",
-        size === "sm" && "p-2"
+        size === "sm" && "p-2",
+        isDragging && "opacity-50 scale-95"
       )}
     >
-      {/* Color indicator */}
+      {/* Drag indicator */}
+      <div className={cn(
+        "absolute top-1 left-1 text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors",
+        size === "sm" && "hidden"
+      )}>
+        <GripVertical className="w-3 h-3" />
+      </div>
+      {/* Custom flower icon */}
       <div
         className={cn(
-          "rounded-full mb-2 flex items-center justify-center shadow-inner",
-          size === "md" ? "w-12 h-12 text-2xl" : "w-8 h-8 text-lg"
+          "rounded-full mb-2 flex items-center justify-center",
+          size === "md" ? "w-14 h-14" : "w-10 h-10"
         )}
-        style={{ backgroundColor: flor.colorHex + "30" }}
+        style={{ backgroundColor: flor.colorHex + "15" }}
       >
-        <span
-          className="drop-shadow-sm"
-          style={{ filter: `drop-shadow(0 0 4px ${flor.colorHex})` }}
-        >
-          {flor.icono}
-        </span>
+        <FlowerIcon
+          color={flor.colorHex}
+          secondaryColor={flor.colorSecundario}
+          centerColor={flor.colorCentro}
+          petalShape={flor.petalos}
+          centerShape={flor.centro}
+          petalCount={flor.numeroPetalos}
+          size={size === "md" ? 44 : 32}
+          animate={false}
+          caracteristicas={flor.caracteristicas}
+        />
       </div>
       
+      {/* Caracteristicas especiales badges */}
+      {flor.caracteristicas && flor.caracteristicas.length > 0 && size === "md" && (
+        <div className="flex flex-wrap gap-1 mb-1 justify-center">
+          {flor.caracteristicas.map((c, i) => (
+            <span
+              key={i}
+              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px]"
+              title={`${getDescripcionCaracteristica(c.nombre)}: ${c.genotipo}`}
+            >
+              {caracteristicaIconos[c.nombre]}
+              {c.genotipo}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* Flower name */}
       <h3 className={cn(
         "font-medium text-card-foreground text-center leading-tight",
@@ -82,6 +131,6 @@ export function FlowerCard({ flor, isSelected, onClick, size = "md" }: FlowerCar
           </svg>
         </div>
       )}
-    </button>
+    </div>
   )
 }

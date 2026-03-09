@@ -14,6 +14,8 @@ import {
 } from "@/lib/flores"
 import { Dna, Sparkles, BookOpen, FlaskConical } from "lucide-react"
 
+const COINS_PER_CORRECT = 200
+
 export default function JardinGenetico() {
   const [plantaMadre, setPlantaMadre] = useState<Flor | null>(null)
   const [plantaPadre, setPlantaPadre] = useState<Flor | null>(null)
@@ -21,6 +23,8 @@ export default function JardinGenetico() {
   const [showCelebration, setShowCelebration] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [activeSlot, setActiveSlot] = useState<"madre" | "padre">("madre")
+  const [totalCoins, setTotalCoins] = useState(0)
+  const [lastCorrectAnswer, setLastCorrectAnswer] = useState<number | null>(null)
 
   // Calculate Punnett square when both parents are selected
   const cuadroPunnett = useMemo(() => {
@@ -47,7 +51,7 @@ export default function JardinGenetico() {
     return obtenerColorDominante(plantaMadre.genotipo, plantaPadre.genotipo)
   }, [plantaMadre, plantaPadre])
 
-  // Handle flower selection
+  // Handle flower selection (click)
   const handleFlowerSelect = useCallback((flor: Flor) => {
     if (activeSlot === "madre") {
       setPlantaMadre(flor)
@@ -59,6 +63,29 @@ export default function JardinGenetico() {
     setShowCelebration(false)
   }, [activeSlot])
 
+  // Handle drop on mother slot
+  const handleDropMadre = useCallback((flor: Flor) => {
+    setPlantaMadre(flor)
+    if (!plantaPadre) {
+      setActiveSlot("padre")
+    }
+    setProbabilidadUsuario("")
+    setShowCelebration(false)
+  }, [plantaPadre])
+
+  // Handle drop on father slot
+  const handleDropPadre = useCallback((flor: Flor) => {
+    // Check compatibility if mother is already selected
+    if (plantaMadre) {
+      const genMadre = plantaMadre.genotipo[0].toLowerCase()
+      const genPadre = flor.genotipo[0].toLowerCase()
+      if (genMadre !== genPadre) return // Incompatible
+    }
+    setPlantaPadre(flor)
+    setProbabilidadUsuario("")
+    setShowCelebration(false)
+  }, [plantaMadre])
+
   // Handle harvest (validation)
   const handleCosechar = useCallback(() => {
     if (probabilidadCorrecta === null) return
@@ -68,6 +95,12 @@ export default function JardinGenetico() {
     
     const esCorrecta = respuestaUsuario === probabilidadCorrecta
     setIsSuccess(esCorrecta)
+    setLastCorrectAnswer(probabilidadCorrecta)
+    
+    if (esCorrecta) {
+      setTotalCoins(prev => prev + COINS_PER_CORRECT)
+    }
+    
     setShowCelebration(true)
   }, [probabilidadUsuario, probabilidadCorrecta])
 
@@ -79,6 +112,19 @@ export default function JardinGenetico() {
     setActiveSlot("madre")
     setShowCelebration(false)
   }, [])
+
+  // Handle celebration close - reset flowers if success
+  const handleCelebrationClose = useCallback(() => {
+    setShowCelebration(false)
+    if (isSuccess) {
+      // Reset for next breeding
+      setPlantaMadre(null)
+      setPlantaPadre(null)
+      setProbabilidadUsuario("")
+      setActiveSlot("madre")
+    }
+    setLastCorrectAnswer(null)
+  }, [isSuccess])
 
   // Filter compatible flowers for second parent
   const floresCompatibles = useMemo(() => {
@@ -104,7 +150,7 @@ export default function JardinGenetico() {
           
           <div className="flex items-center gap-2 bg-secondary/50 px-3 py-1.5 rounded-full">
             <span className="text-lg">🪙</span>
-            <span className="font-semibold text-secondary-foreground">1,250</span>
+            <span className="font-semibold text-secondary-foreground">{totalCoins.toLocaleString()}</span>
           </div>
         </div>
       </header>
@@ -164,6 +210,7 @@ export default function JardinGenetico() {
                     setActiveSlot("madre")
                     setProbabilidadUsuario("")
                   }}
+                  onDrop={handleDropMadre}
                   isActive={activeSlot === "madre" && !plantaMadre}
                 />
                 
@@ -179,6 +226,7 @@ export default function JardinGenetico() {
                     setActiveSlot("padre")
                     setProbabilidadUsuario("")
                   }}
+                  onDrop={handleDropPadre}
                   isActive={activeSlot === "padre" && !plantaPadre}
                 />
               </div>
@@ -296,13 +344,14 @@ export default function JardinGenetico() {
       <Celebration
         show={showCelebration}
         isSuccess={isSuccess}
-        message={isSuccess ? "¡Genética Perfecta!" : "¡Casi lo logras!"}
+        message={isSuccess ? "¡Genetica Perfecta!" : "¡Casi lo logras!"}
         subMessage={
           isSuccess
-            ? "Has dominado este cruce genético. ¡Sigue aprendiendo!"
-            : `Recuerda que el gen ${plantaMadre?.genotipo[0].toUpperCase()} domina sobre el ${plantaMadre?.genotipo[0].toLowerCase()}. La respuesta correcta era ${probabilidadCorrecta}%. ¡Inténtalo de nuevo!`
+            ? "Has dominado este cruce genetico. ¡Sigue aprendiendo!"
+            : `Recuerda que el gen ${plantaMadre?.genotipo[0].toUpperCase()} domina sobre el ${plantaMadre?.genotipo[0].toLowerCase()}. La respuesta correcta era ${lastCorrectAnswer}%. ¡Intentalo de nuevo!`
         }
-        onClose={() => setShowCelebration(false)}
+        coinsEarned={COINS_PER_CORRECT}
+        onClose={handleCelebrationClose}
       />
     </div>
   )
