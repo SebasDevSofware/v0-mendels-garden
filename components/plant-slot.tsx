@@ -70,6 +70,7 @@ export function PlantSlot({ label, flor, onClear, onDrop, isActive }: PlantSlotP
               petalCount={flor.numeroPetalos}
               size={56}
               animate
+              caracteristicas={flor.caracteristicas}
             />
             <span className="mt-1 font-mono text-sm font-bold text-primary">
               {flor.genotipo}

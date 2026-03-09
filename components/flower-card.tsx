@@ -1,9 +1,19 @@
 "use client"
 
-import { Flor } from "@/lib/flores"
+import { Flor, getDescripcionCaracteristica } from "@/lib/flores"
 import { cn } from "@/lib/utils"
-import { GripVertical } from "lucide-react"
+import { GripVertical, Sparkles, AlertTriangle, Flower2, Wind } from "lucide-react"
 import { FlowerIcon } from "./flower-icon"
+
+// Iconos para caracteristicas especiales
+const caracteristicaIconos: Record<string, React.ReactNode> = {
+  espinas: <AlertTriangle className="w-3 h-3" />,
+  venenosa: <AlertTriangle className="w-3 h-3 text-purple-500" />,
+  manchas: <Flower2 className="w-3 h-3" />,
+  bioluminiscente: <Sparkles className="w-3 h-3 text-cyan-400" />,
+  fragante: <Wind className="w-3 h-3 text-pink-400" />,
+  doble: <Flower2 className="w-3 h-3" />,
+}
 
 interface FlowerCardProps {
   flor: Flor
@@ -58,9 +68,26 @@ export function FlowerCard({ flor, isSelected, onClick, size = "md", isDragging 
           petalCount={flor.numeroPetalos}
           size={size === "md" ? 44 : 32}
           animate={false}
+          caracteristicas={flor.caracteristicas}
         />
       </div>
       
+      {/* Caracteristicas especiales badges */}
+      {flor.caracteristicas && flor.caracteristicas.length > 0 && size === "md" && (
+        <div className="flex flex-wrap gap-1 mb-1 justify-center">
+          {flor.caracteristicas.map((c, i) => (
+            <span
+              key={i}
+              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px]"
+              title={`${getDescripcionCaracteristica(c.nombre)}: ${c.genotipo}`}
+            >
+              {caracteristicaIconos[c.nombre]}
+              {c.genotipo}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* Flower name */}
       <h3 className={cn(
         "font-medium text-card-foreground text-center leading-tight",

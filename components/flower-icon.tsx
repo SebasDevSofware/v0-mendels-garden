@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import type { CaracteristicaEspecial, GenCaracteristica } from "@/lib/flores"
 
 export type PetalShape = "rounded" | "pointed" | "heart" | "wavy" | "tulip"
 export type CenterShape = "circle" | "star" | "dots" | "spiral"
@@ -17,6 +18,8 @@ interface FlowerIconProps {
   animate?: boolean
   withStem?: boolean
   withLeaves?: boolean
+  // Nuevas propiedades para caracteristicas especiales
+  caracteristicas?: GenCaracteristica[]
 }
 
 export function FlowerIcon({
@@ -31,11 +34,32 @@ export function FlowerIcon({
   animate = false,
   withStem = false,
   withLeaves = false,
+  caracteristicas = [],
 }: FlowerIconProps) {
   const viewBoxSize = 100
   const center = viewBoxSize / 2
   const petalLength = 28
   const petalWidth = 18
+
+  // Verificar caracteristicas activas (expresadas)
+  const tieneEspinas = caracteristicas.some(c => 
+    c.nombre === "espinas" && c.genotipo.split("").some(a => a === a.toUpperCase())
+  )
+  const tieneVeneno = caracteristicas.some(c => 
+    c.nombre === "venenosa" && c.genotipo === c.genotipo.toUpperCase()
+  )
+  const tieneManchas = caracteristicas.some(c => 
+    c.nombre === "manchas" && c.genotipo.split("").some(a => a === a.toUpperCase())
+  )
+  const tieneBioluminiscencia = caracteristicas.some(c => 
+    c.nombre === "bioluminiscente" && c.genotipo === c.genotipo.toUpperCase()
+  )
+  const tieneFragancia = caracteristicas.some(c => 
+    c.nombre === "fragante" && c.genotipo.split("").some(a => a === a.toUpperCase())
+  )
+  const tieneDoble = caracteristicas.some(c => 
+    c.nombre === "doble" && c.genotipo.split("").some(a => a === a.toUpperCase())
+  )
 
   // Generate petal paths based on shape
   const generatePetal = (angle: number, index: number) => {
@@ -296,6 +320,81 @@ export function FlowerIcon({
 
       {/* Center */}
       {generateCenter()}
+
+      {/* Caracteristicas especiales visuales */}
+      
+      {/* Manchas en petalos */}
+      {tieneManchas && (
+        <g>
+          {Array.from({ length: 5 }, (_, i) => {
+            const angle = (360 / 5) * i - 90
+            const rad = (angle * Math.PI) / 180
+            const x = center + Math.cos(rad) * 20
+            const y = center + Math.sin(rad) * 20
+            return (
+              <circle
+                key={`mancha-${i}`}
+                cx={x}
+                cy={y}
+                r={3}
+                fill="#00000030"
+              />
+            )
+          })}
+        </g>
+      )}
+
+      {/* Bioluminiscencia (brillo) */}
+      {tieneBioluminiscencia && (
+        <g>
+          <circle
+            cx={center}
+            cy={center}
+            r={35}
+            fill="none"
+            stroke="#22d3ee"
+            strokeWidth="2"
+            opacity="0.6"
+            className="animate-pulse"
+          />
+          <circle
+            cx={center}
+            cy={center}
+            r={40}
+            fill="none"
+            stroke="#22d3ee"
+            strokeWidth="1"
+            opacity="0.3"
+            className="animate-pulse"
+          />
+        </g>
+      )}
+
+      {/* Icono de veneno */}
+      {tieneVeneno && (
+        <g transform={`translate(${viewBoxSize - 18}, 5)`}>
+          <circle cx="8" cy="8" r="8" fill="#7c3aed" />
+          <text x="8" y="12" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">!</text>
+        </g>
+      )}
+
+      {/* Icono de fragancia */}
+      {tieneFragancia && (
+        <g transform={`translate(5, 5)`} opacity="0.7">
+          {[0, 1, 2].map(i => (
+            <path
+              key={`fragancia-${i}`}
+              d={`M ${4 + i * 5} 12 Q ${6 + i * 5} 6 ${4 + i * 5} 0`}
+              fill="none"
+              stroke="#a855f7"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              className="animate-pulse"
+              style={{ animationDelay: `${i * 0.2}s` }}
+            />
+          ))}
+        </g>
+      )}
     </svg>
   )
 }

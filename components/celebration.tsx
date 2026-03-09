@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 
 interface CelebrationProps {
@@ -8,6 +8,7 @@ interface CelebrationProps {
   isSuccess: boolean
   message: string
   subMessage?: string
+  coinsEarned?: number
   onClose: () => void
 }
 
@@ -50,14 +51,8 @@ function Confetti() {
   )
 }
 
-export function Celebration({ show, isSuccess, message, subMessage, onClose }: CelebrationProps) {
-  useEffect(() => {
-    if (show) {
-      const timer = setTimeout(onClose, 4000)
-      return () => clearTimeout(timer)
-    }
-  }, [show, onClose])
-
+export function Celebration({ show, isSuccess, message, subMessage, coinsEarned = 200, onClose }: CelebrationProps) {
+  // No auto-close - user must click the button
   if (!show) return null
 
   return (
@@ -105,7 +100,7 @@ export function Celebration({ show, isSuccess, message, subMessage, onClose }: C
           {isSuccess && (
             <div className="mt-4 inline-flex items-center gap-2 bg-chart-4/20 text-chart-5 px-4 py-2 rounded-full">
               <span className="text-xl">🪙</span>
-              <span className="font-bold">+200 Monedas de ADN</span>
+              <span className="font-bold">+{coinsEarned} Monedas de ADN</span>
             </div>
           )}
           

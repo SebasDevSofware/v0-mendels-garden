@@ -14,6 +14,8 @@ import {
 } from "@/lib/flores"
 import { Dna, Sparkles, BookOpen, FlaskConical } from "lucide-react"
 
+const COINS_PER_CORRECT = 200
+
 export default function JardinGenetico() {
   const [plantaMadre, setPlantaMadre] = useState<Flor | null>(null)
   const [plantaPadre, setPlantaPadre] = useState<Flor | null>(null)
@@ -21,6 +23,8 @@ export default function JardinGenetico() {
   const [showCelebration, setShowCelebration] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [activeSlot, setActiveSlot] = useState<"madre" | "padre">("madre")
+  const [totalCoins, setTotalCoins] = useState(0)
+  const [lastCorrectAnswer, setLastCorrectAnswer] = useState<number | null>(null)
 
   // Calculate Punnett square when both parents are selected
   const cuadroPunnett = useMemo(() => {
@@ -91,6 +95,12 @@ export default function JardinGenetico() {
     
     const esCorrecta = respuestaUsuario === probabilidadCorrecta
     setIsSuccess(esCorrecta)
+    setLastCorrectAnswer(probabilidadCorrecta)
+    
+    if (esCorrecta) {
+      setTotalCoins(prev => prev + COINS_PER_CORRECT)
+    }
+    
     setShowCelebration(true)
   }, [probabilidadUsuario, probabilidadCorrecta])
 
@@ -102,6 +112,19 @@ export default function JardinGenetico() {
     setActiveSlot("madre")
     setShowCelebration(false)
   }, [])
+
+  // Handle celebration close - reset flowers if success
+  const handleCelebrationClose = useCallback(() => {
+    setShowCelebration(false)
+    if (isSuccess) {
+      // Reset for next breeding
+      setPlantaMadre(null)
+      setPlantaPadre(null)
+      setProbabilidadUsuario("")
+      setActiveSlot("madre")
+    }
+    setLastCorrectAnswer(null)
+  }, [isSuccess])
 
   // Filter compatible flowers for second parent
   const floresCompatibles = useMemo(() => {
@@ -127,7 +150,7 @@ export default function JardinGenetico() {
           
           <div className="flex items-center gap-2 bg-secondary/50 px-3 py-1.5 rounded-full">
             <span className="text-lg">🪙</span>
-            <span className="font-semibold text-secondary-foreground">1,250</span>
+            <span className="font-semibold text-secondary-foreground">{totalCoins.toLocaleString()}</span>
           </div>
         </div>
       </header>
@@ -321,13 +344,14 @@ export default function JardinGenetico() {
       <Celebration
         show={showCelebration}
         isSuccess={isSuccess}
-        message={isSuccess ? "¡Genética Perfecta!" : "¡Casi lo logras!"}
+        message={isSuccess ? "¡Genetica Perfecta!" : "¡Casi lo logras!"}
         subMessage={
           isSuccess
-            ? "Has dominado este cruce genético. ¡Sigue aprendiendo!"
-            : `Recuerda que el gen ${plantaMadre?.genotipo[0].toUpperCase()} domina sobre el ${plantaMadre?.genotipo[0].toLowerCase()}. La respuesta correcta era ${probabilidadCorrecta}%. ¡Inténtalo de nuevo!`
+            ? "Has dominado este cruce genetico. ¡Sigue aprendiendo!"
+            : `Recuerda que el gen ${plantaMadre?.genotipo[0].toUpperCase()} domina sobre el ${plantaMadre?.genotipo[0].toLowerCase()}. La respuesta correcta era ${lastCorrectAnswer}%. ¡Intentalo de nuevo!`
         }
-        onClose={() => setShowCelebration(false)}
+        coinsEarned={COINS_PER_CORRECT}
+        onClose={handleCelebrationClose}
       />
     </div>
   )
